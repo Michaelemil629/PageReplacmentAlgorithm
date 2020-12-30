@@ -1,0 +1,325 @@
+package pagereplacmentproject;
+import java.util.Scanner;
+import java.io.IOException;
+import java.util.ArrayList;
+/**
+ *
+ * @author mickey
+ */
+public class PageReplacmentProject {
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args)throws IOException {
+        // TODO code application logic here
+        Scanner in = new Scanner(System.in);
+        int num;
+
+       
+        System.out.println("hints.......... ");
+        System.out.println("1. states for FIFO Algorithm");
+        System.out.println("2. states for Optimal Algorithm");
+        System.out.println("3. states for LRU Algorithm");
+        num = Integer.parseInt(in.nextLine());
+        if(num == 1){
+        /*************FIRST IN FIRST OUT Algorithm*******************/                           
+        int frames = 0;
+        int point = 0;
+        int Pagefault = 0;
+        int reflength;
+        Boolean isFull = false;
+        int reference[];
+        int page[];
+        ArrayList<Integer> array = new ArrayList<Integer>();
+       
+        System.out.println("Please enter the number of Frames...... ");
+        frames = Integer.parseInt(in.nextLine());
+        
+        
+        System.out.println("Please enter size of refrence........");
+        reflength = Integer.parseInt(in.nextLine());
+        
+        reference = new int[reflength];
+        System.out.println("Please enter the references......... ");
+        
+        for(int i = 0; i < reflength; i++)
+        {
+            reference[i] = Integer.parseInt(in.nextLine());
+        }
+        System.out.print("* * * * * * * * * * *FIFO ALGORITHM * * * * * * * * * * * * * *");
+
+
+        page = new int[frames];
+        for(int j = 0; j < frames; j++)
+            page[j] = '*';
+
+        System.out.println();
+        for(int i = 0; i < reflength; i++){
+            if(array.contains(reference[i])){
+                array.remove(array.indexOf(reference[i]));
+            }
+            array.add(reference[i]);
+            int search = -1;
+            for(int j = 0; j < frames; j++){
+                if(page[j] == reference[i]){
+
+                    search = j;
+
+                    System.out.print(reference[i]+": at :");
+                    for(int l = 0; l < frames; l++){
+                        System.out.printf("%3d ",page[l]);}
+                    System.out.println("Hit: (Number of Page Faults: "+Pagefault+")");
+                    break;
+                }
+            }
+            if(search == -1){
+                if(isFull){
+                    int minlocation = reflength;
+                    for(int j = 0; j < frames; j++){     
+                        if(array.contains(page[j])){ 
+                            int temp = array.indexOf(page[j]);
+                            if(temp == minlocation){
+
+                                minlocation = temp;
+                                point = j;
+                            }
+                        }
+                    }
+                }
+                page[point] = reference[i];
+                Pagefault++;
+                System.out.print(reference[i]+": at: ");
+                for(int w = 0; w < frames; w++){
+                    System.out.printf("%3d ",page[w]);
+                }
+                System.out.println("Page Fault: (Number of Page Faults: "+Pagefault+")");
+                point++;
+                if(point == frames){
+                    point = 0;
+                    isFull = true;
+                }
+            }
+        }
+        System.out.println("Total no of page Faults = " + Pagefault); 
+        }
+        else if(num == 2){
+          /**********Optimal Algorithm**********/  
+        int frames = 0;
+        int point2 = 0;
+        int numFault = 0;
+        int reflength2;
+        boolean isFull = false;
+        int buffer[];
+        boolean hit[];
+        int Pagefault2[];
+        int reference2[];
+        int Pagelayout[][];
+        System.out.println("Please enter the number of frames......... ");
+        frames = Integer.parseInt(in.nextLine());
+
+        System.out.println("Please enter size of refrence........ ");
+        reflength2 = Integer.parseInt(in.nextLine());
+
+        reference2 = new int[reflength2];
+        Pagelayout = new int[reflength2][frames];
+        buffer = new int[frames];
+        hit = new boolean[reflength2];
+        Pagefault2 = new int[reflength2];
+        for(int j = 0; j < frames; j++)
+        {
+            buffer[j] = -1;
+        }
+
+        System.out.println("Please enter the references.........");
+        for(int i = 0; i < reflength2; i++)
+        {
+            reference2[i] = Integer.parseInt(in.nextLine());
+        }
+        System.out.println("* * * * * * * *Optimal Algorithm* * * * * * * * *");
+        for(int i = 0; i < reflength2; i++)
+        {
+            int search = -1;
+            for(int j = 0; j < frames; j++)
+            {
+                if(buffer[j] == reference2[i])
+                {
+                    search = j;
+                    hit[i] = true;
+                    Pagefault2[i] = numFault;
+                    break;
+                }
+            }
+
+            if(search == -1)
+            {
+                if(isFull)
+                {
+                    int index[] = new int[frames];
+                    boolean index_flag[] = new boolean[frames];
+                    for(int j = i + 1; j < reflength2; j++)
+                    {
+                        for(int k = 0; k < frames; k++)
+                        {
+                            if((reference2[j] == buffer[k]) && (index_flag[k] == false))
+                            {
+                                index[k] = j;
+                                index_flag[k] = true;
+                                break;
+                            }
+                        }
+                    }
+                    int maxno = index[0];
+                    point2 = 0;
+                    if(maxno == 0)
+                    {
+                        maxno = 200;
+                    }
+
+                    for(int j = 0; j < frames; j++)
+                    {
+                        if(index[j] == 0)
+                        {
+                            index[j] = 200;
+                        }
+
+                        if(index[j] > maxno)
+                        {
+                            maxno = index[j];
+                            point2 = j;
+                        }
+                    }
+                }
+                buffer[point2] = reference2[i];
+                numFault++;
+                Pagefault2[i] = numFault;
+                if(!isFull)
+                {
+                    point2++;
+                    if(point2 == frames)
+                    {
+                        point2 = 0;
+                        isFull = true;
+                    }
+                }
+            }
+
+            for(int j = 0; j < frames; j++)
+            {
+                Pagelayout[i][j] = buffer[j];
+            }
+        }
+
+        for(int i = 0; i < reflength2; i++)
+        {
+            System.out.print(reference2[i] + ": at : ");
+            for(int j = 0; j < frames; j++)
+            {
+                if (Pagelayout[i][j] == -1)
+                {
+                    System.out.printf("%3s ", "*");
+                } else
+                {
+                    System.out.printf("%3d ", Pagelayout[i][j]);
+                }
+            }
+            System.out.print(": ");
+            if (hit[i]) {
+                System.out.print("Hit");
+            } else
+            {
+                System.out.print("Page Fault");
+            }
+            System.out.print(": (Number of Page Faults: " + Pagefault2[i] + ")");
+            System.out.println();
+        }
+        System.out.println("Total Number of Page Faults: " + numFault); 
+        }
+        
+        else if(num == 3){
+            /***********LEAST RECENTLY USED Algorithm**************/
+        int frames = 0;
+        int point3 = 0;
+        int pagefault3 = 0;
+        int reflength3;
+        Boolean isFull = false;
+        int reference3[];
+        int Page2[];
+        ArrayList<Integer> array2 = new ArrayList<Integer>();
+       
+        System.out.println("Please enter the number of frames......... ");
+        frames = Integer.parseInt(in.nextLine());
+        
+        
+        System.out.println("Please enter size of refrence........  ");
+        reflength3 = Integer.parseInt(in.nextLine());
+        
+        reference3 = new int[reflength3];
+        
+                System.out.println("Please enter the references......... ");
+        for(int i = 0; i < reflength3; i++)
+        {
+            reference3[i] = Integer.parseInt(in.nextLine());
+        }
+        System.out.print("* * * * * * * *LEAST RECENTLY USED* * * * * * * * * ");
+       
+
+        Page2 = new int[frames];
+        for(int j = 0; j < frames; j++)
+            Page2[j] = '*';
+
+        System.out.println();
+        for(int i = 0; i < reflength3; i++){
+            if(array2.contains(reference3[i])){
+                array2.remove(array2.indexOf(reference3[i]));
+            }
+            array2.add(reference3[i]);
+            int search = -1;
+            for(int j = 0; j < frames; j++){
+                if(Page2[j] == reference3[i]){
+
+                    search = j;
+
+                    System.out.print(reference3[i]+": at :");
+                    for(int m = 0; m < frames; m++){
+                        System.out.printf("%3d ",Page2[m]);}
+                    System.out.println("Hit: (Number of Page Faults: "+pagefault3+")");
+                    break;
+                }
+            }
+            if(search == -1){
+                if(isFull){
+                    int minlocation2 = reflength3;
+                    for(int j = 0; j < frames; j++){     
+                        if(array2.contains(Page2[j])){ 
+                            int temp = array2.indexOf(Page2[j]);
+                            if(temp < minlocation2){
+
+                                minlocation2 = temp;
+                                point3 = j;
+                            }
+                        }
+                    }
+                }
+                Page2[point3] = reference3[i];
+                pagefault3++;
+                System.out.print(reference3[i]+": at :");
+                for(int w = 0; w < frames; w++){
+                    System.out.printf("%3d ",Page2[w]);
+                }
+                System.out.println("Page Fault: (Number of Page Faults: "+pagefault3+")");
+                point3++;
+                if(point3 == frames){
+                    point3 = 0;
+                    isFull = true;
+                }
+            }
+        }
+        System.out.println("Total number of Page Faults: " + pagefault3);
+            
+            
+        }
+        }
+        
+        
+    }
